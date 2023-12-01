@@ -21,7 +21,10 @@
     public struct BinEntry
     {
         public int fileNameOffset;
-        public int soundIndex;
+        public byte unknown0x4;
+        public byte unknown0x5;
+        public byte unknown0x6;
+        public byte soundIndex;
         public byte bankId;
         public byte bankIdSoundIndex;
         public byte loudnessLeftChannel;

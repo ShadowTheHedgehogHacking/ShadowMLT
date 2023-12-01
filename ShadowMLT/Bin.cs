@@ -13,7 +13,8 @@ namespace ShadowMLT
     public struct Bin
     {
         public const int ENTRY_COUNT_OFFSET = 0x24;
-        public const int ENTRY_SIZE = 0x20;
+        public const int SOUND_NAMES_ADDITIVE_OFFSET = 0x20;
+        public const int ENTRY_SIZE = 0x18;
         public string fileName;
         public BinHeader header;
         public List<BinEntry> entryTable;
