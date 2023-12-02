@@ -35,7 +35,7 @@ namespace ShadowMLT
             int positionIndex = 0x0;
             BinHeader binHeader = new BinHeader
             {
-                unknown_0x0 = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex),
+/*                unknown_0x0 = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex),
                 unknown_0x4 = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex + 0x4),
                 unknown_0x8 = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex + 0x8),
                 unknown_0xC = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex + 0xC),
@@ -43,7 +43,7 @@ namespace ShadowMLT
                 unknown_0x14 = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex + 0x14),
                 unknown_0x18 = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex + 0x18),
                 unknown_0x1C = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex + 0x1C),
-                unknown_0x20 = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex + 0x20),
+                unknown_0x20 = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex + 0x20),*/
                 numberOfEntries = numberOfEntries,
             };
             gcax.bin.header = binHeader;
@@ -65,7 +65,10 @@ namespace ShadowMLT
                     soundDuration = binFile[positionIndex + 0xD],
                     unknown0xE_Divisible_By_3_Changes_Bank = binFile[positionIndex + 0xE],
                     unknown0xF = binFile[positionIndex + 0xF],
-                    unknown0x10 = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex + 0x10),
+                    unknown0x10 = binFile[positionIndex + 0x10],
+                    unknown0x11 = binFile[positionIndex + 0x11],
+                    unknown0x12 = binFile[positionIndex + 0x12],
+                    unknown0x13 = binFile[positionIndex + 0x13],
                     unknown0x14_NoSoundIfGreaterThan0x80 = binFile[positionIndex + 0x14],
                     unknown0x15 = binFile[positionIndex + 0x15],
                     unknown0x16 = binFile[positionIndex + 0x16],

@@ -33,7 +33,10 @@
         public byte soundDuration;
         public byte unknown0xE_Divisible_By_3_Changes_Bank;
         public byte unknown0xF;
-        public int unknown0x10;
+        public byte unknown0x10;
+        public byte unknown0x11;
+        public byte unknown0x12;
+        public byte unknown0x13;
         public byte unknown0x14_NoSoundIfGreaterThan0x80;
         public byte unknown0x15;
         public byte unknown0x16;
