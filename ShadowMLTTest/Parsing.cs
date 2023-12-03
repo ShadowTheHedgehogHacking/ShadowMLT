@@ -8,8 +8,9 @@ namespace ShadowMLTTest
         [Fact]
         public void ReadShadowBin_Success()
         {
-            var fileName = parentDirectory + Assets.Assets.shadow_bin;
-            var gcax = GCAX.ParseMLTandBIN("temp", fileName);
+            var shadowBinPath = parentDirectory + Assets.Assets.shadow_bin;
+            var shadowMltPath = parentDirectory + Assets.Assets.shadow_mlt;
+            var gcax = GCAX.ParseMLTandBIN(shadowMltPath, shadowBinPath);
 /*            Assert.Equal(fileName, fnt.fileName);
             Assert.Equal("", fnt.filterString);
             Assert.Equal(471, fnt.GetEntryTableCount());
