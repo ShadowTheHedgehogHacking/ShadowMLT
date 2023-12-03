@@ -3,7 +3,6 @@ using System;
 using ShadowMLT.Structures;
 using System.Text;
 using System.IO;
-using System.ComponentModel;
 
 namespace ShadowMLT
 {
@@ -30,7 +29,6 @@ namespace ShadowMLT
 
             gcax.bin.entryTable = new List<BinEntry>();
             gcax.bin.soundNames = new List<string>();
-            gcax.mlt.entryTable = new List<SoundEntry>();
 
             int positionIndex = 0x0;
             BinHeader binHeader = new BinHeader
@@ -71,15 +69,6 @@ namespace ShadowMLT
                 unknown0x21 = binFile[positionIndex + 0x21],
                 unknown0x22 = binFile[positionIndex + 0x22],
                 unknown0x23 = binFile[positionIndex + 0x23],
-                /*                unknown_0x0 = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex),
-                                unknown_0x4 = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex + 0x4),
-                                unknown_0x8 = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex + 0x8),
-                                unknown_0xC = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex + 0xC),
-                                unknown_0x10 = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex + 0x10),
-                                unknown_0x14 = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex + 0x14),
-                                unknown_0x18 = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex + 0x18),
-                                unknown_0x1C = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex + 0x1C),
-                                unknown_0x20 = BitConverterExtensions.ToInt32BigEndian(binFile, positionIndex + 0x20),*/
                 numberOfEntries = numberOfEntries,
             };
             gcax.bin.header = binHeader;
@@ -132,22 +121,63 @@ namespace ShadowMLT
             gcax.mlt.header = reader.ReadBytes(Mlt.MLT_HEADER_SIZE);
             byte[] audioData = new byte[0x80000];
 
-            byte[] mltAudioEntriesSignature = { 0x67, 0x63, 0x61, 0x78, 0x4D, 0x50, 0x42, 0x50 };
+            ulong mltAudioEntriesSignature = 5783273165159490407;
             positionIndex = 0;
             while (true)
             {
                 var savedPosition = reader.BaseStream.Position;
-                var signature = reader.ReadBytes(0x8);
+                var signature = reader.ReadUInt64();
                 reader.BaseStream.Position = savedPosition;
-                if (signature[0] == mltAudioEntriesSignature[0] && signature[1] == mltAudioEntriesSignature[1] && signature[2] == mltAudioEntriesSignature[2] && signature[3] == mltAudioEntriesSignature[3] && signature[4] == mltAudioEntriesSignature[4] && signature[5] == mltAudioEntriesSignature[5] && signature[6] == mltAudioEntriesSignature[6] && signature[7] == mltAudioEntriesSignature[7])
+                if (signature == mltAudioEntriesSignature)
                     break;
-                reader.Read(audioData, positionIndex, 1);
+                reader.Read(audioData, positionIndex, 0x10);
                 positionIndex++;
             }
-            byte[] finalAudioData = new byte[reader.BaseStream.Position - Mlt.MLT_HEADER_SIZE];
-            gcax.mlt.audioData = finalAudioData;
-            //gcax.mlt.entryTable = soundEntries;
+            var audioDataLength = reader.BaseStream.Position - Mlt.MLT_HEADER_SIZE;
+            byte[] finalAudioData = new byte[audioDataLength];
+            Array.Copy(audioData, finalAudioData, audioDataLength);
 
+            byte[] segmentedAudioData = new byte[audioDataLength];
+            BinaryReader audioDataReader = new BinaryReader(new MemoryStream(finalAudioData));
+            positionIndex = 0;
+            while (true)
+            {
+                var savedPosition = reader.BaseStream.Position;
+                if (savedPosition % 0x10 == 0)
+                {
+                    var entryEnd = true;
+                    var padding = reader.ReadBytes(0x10);
+                    for (int i = 0; i < padding.Length; i++)
+                    {
+                        if (padding[i] != 0)
+                            entryEnd = false;
+                    }
+                    if (entryEnd)
+                    {
+
+                        // create the audio data from the buffer
+                    }
+                }
+                reader.BaseStream.Position = savedPosition;
+                audioDataReader.Read(segmentedAudioData, positionIndex, 1);
+                positionIndex++;
+            }
+
+            gcax.mlt.audioData = finalAudioData;
+
+            gcax.mlt.soundTable = new List<SoundEntry>();
+            gcax.mlt.soundTableHeader = reader.ReadBytes(0x10);
+
+            for (int i = 0; i < numberOfEntries; i++)
+            {
+                SoundEntry entry = new SoundEntry
+                {
+                    dspHeader = reader.ReadBytes(0x40),
+                    unknown = reader.ReadBytes(0x10),
+                };
+                gcax.mlt.soundTable.Add(entry);
+            }
+            gcax.mlt.footer = reader.ReadBytes((int)(reader.BaseStream.Length - reader.BaseStream.Position));
             return gcax;
         }
 

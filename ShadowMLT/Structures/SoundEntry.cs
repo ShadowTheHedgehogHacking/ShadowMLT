@@ -2,8 +2,9 @@
 {
     public struct SoundEntry
     {
-        DSPHeader header;
-        public byte unknown0x0;
+        public byte[] dspHeader; // DSPHeader dspHeader;
+        public byte[] unknown;
+/*        public byte unknown0x0;
         public byte unknown0x1;
         public byte unknown0x2;
         public byte unknown0x3;
@@ -18,6 +19,6 @@
         public byte unknown0xC;
         public byte unknown0xD;
         public byte unknown0xE;
-        public byte unknown0xF;
+        public byte unknown0xF;*/
     }
 }

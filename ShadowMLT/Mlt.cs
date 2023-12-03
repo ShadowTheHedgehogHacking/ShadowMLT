@@ -11,7 +11,7 @@ namespace ShadowMLT
         public const string headerSoundDataUnknown = "gcaxMPB";
         public const string headerSoundData = "gcaxMPBW";
 
-        public const string headerSoundEntries = "gcaxMPBP";
+        public const string headerSoundTable = "gcaxMPBP";
 
         // end of file is padded with 0x55s. Then at the very end of the file is an entire 0x10 of 0x55s
 
@@ -21,7 +21,8 @@ namespace ShadowMLT
 
         public byte[] header;
         public byte[] audioData;
-        public List<SoundEntry> entryTable;
-
+        public byte[] soundTableHeader;
+        public List<SoundEntry> soundTable;
+        public byte[] footer;
     }
 }
