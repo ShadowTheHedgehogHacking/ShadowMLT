@@ -119,7 +119,7 @@ namespace ShadowMLT
             BinaryReader reader = new BinaryReader(mltFile);
             
             gcax.mlt.header = reader.ReadBytes(Mlt.MLT_HEADER_SIZE);
-            byte[] audioData = new byte[0x80000];
+            byte[] audioData = new byte[0x800000];
 
             ulong mltAudioEntriesSignature = 5783273165159490407;
             positionIndex = 0;
@@ -129,7 +129,9 @@ namespace ShadowMLT
                 var signature = reader.ReadUInt64();
                 reader.BaseStream.Position = savedPosition;
                 if (signature == mltAudioEntriesSignature)
+                {
                     break;
+                }
                 reader.Read(audioData, positionIndex, 0x10);
                 positionIndex++;
             }
@@ -137,33 +139,41 @@ namespace ShadowMLT
             byte[] finalAudioData = new byte[audioDataLength];
             Array.Copy(audioData, finalAudioData, audioDataLength);
 
-            byte[] segmentedAudioData = new byte[audioDataLength];
+            gcax.mlt.audioData = new List<byte[]>();
+            var segmentedAudioData = new List<byte>();
             BinaryReader audioDataReader = new BinaryReader(new MemoryStream(finalAudioData));
-            positionIndex = 0;
-            while (true)
+            while (audioDataReader.BaseStream.Position < audioDataLength)
             {
-                var savedPosition = reader.BaseStream.Position;
-                if (savedPosition % 0x10 == 0)
+                if (audioDataReader.BaseStream.Position % 0x10 == 0)
                 {
+                    var savedPosition = audioDataReader.BaseStream.Position;
                     var entryEnd = true;
-                    var padding = reader.ReadBytes(0x10);
+                    var padding = audioDataReader.ReadBytes(0x10);
                     for (int i = 0; i < padding.Length; i++)
                     {
                         if (padding[i] != 0)
+                        {
                             entryEnd = false;
+                            break;
+                        }
                     }
                     if (entryEnd)
                     {
-
-                        // create the audio data from the buffer
+                        segmentedAudioData.AddRange(padding);
+                        gcax.mlt.audioData.Add(segmentedAudioData.ToArray());
+                        segmentedAudioData.Clear();
+                    }
+                    else
+                    {
+                        audioDataReader.BaseStream.Position = savedPosition;
+                        segmentedAudioData.Add(audioDataReader.ReadByte());
                     }
                 }
-                reader.BaseStream.Position = savedPosition;
-                audioDataReader.Read(segmentedAudioData, positionIndex, 1);
-                positionIndex++;
+                else
+                {
+                    segmentedAudioData.Add(audioDataReader.ReadByte());
+                }
             }
-
-            gcax.mlt.audioData = finalAudioData;
 
             gcax.mlt.soundTable = new List<SoundEntry>();
             gcax.mlt.soundTableHeader = reader.ReadBytes(0x10);

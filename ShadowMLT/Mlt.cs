@@ -20,7 +20,7 @@ namespace ShadowMLT
         public const int SOUND_ENTRY_SIZE = 0x50;
 
         public byte[] header;
-        public byte[] audioData;
+        public List<byte[]> audioData;
         public byte[] soundTableHeader;
         public List<SoundEntry> soundTable;
         public byte[] footer;
